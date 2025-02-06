@@ -2,6 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const AppModel = require('./models/Application')
+const RegisterModel = require('./models/Register')
+
 const app = express()
 app.use(cors({ credentials: true }));
 app.use(express.json())
@@ -46,6 +48,29 @@ app.post("/creating", (req, res) => {
       res.status(500).json({ message: "Error fetching users" });
     }
   });
+
+
+  app.post('/register', (req, res) => {
+    RegisterModel.create(req.body)
+    .then(register => res.json(register)) 
+    .catch(err => res.status(500).json({ error: err.message })); 
+});
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  RegisterModel.findOne({ email: email })
+      .then(user => {
+          if (!user) {
+              return res.json({ success: false, message: "User not found" });
+          }
+          if (user.password !== password) {
+              return res.json({ success: false, message: "Incorrect password" });
+          }
+          return res.json({ success: true, message: "Login successful" });
+      })
+      .catch(err => res.status(500).json({ error: err.message }));
+});
 
 
 

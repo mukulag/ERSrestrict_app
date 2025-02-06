@@ -7,6 +7,8 @@ import User from './User';
 // import Sidebar from './components/Sidebar';
 // import Navbar from './components/Navbar';
 // import MainContent from './components/MainContent';
+import Signup from './pages/Signup';  
+import Login from './pages/Login';  
 
 import CreateUser from './CreateUser';
 import UpdateUser from './UpdateUser';
@@ -18,6 +20,10 @@ function App() {
         <Routes>
           
           <Route path='/' element={<User />}></Route>
+          <Route path='/register' element={<Signup />}></Route>
+          <Route path='/login' element={<Login />}></Route>
+
+
           <Route path='/create' element={<CreateUser />}></Route>
           <Route path='/update' element={<UpdateUser />}></Route>
 
