@@ -1,18 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from "./components/Navbar";
-import Sidebar from './components/Sidebar';
-
-const CreateUser = () => {
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
+const CreateApp = () => {
+  const [frequencies, setFrequencies] = useState([]);  // To hold frequency data
+  const [selectedFrequency, setSelectedFrequency] = useState('');  // Store selected frequency ID
   const [appName, setAppName] = useState('');
   const [roles, setRoles] = useState('');
-  const [status, setStatus] = useState('');
-  const [lastReviewed, setLastReviewed] = useState('');
-  const [desc, setDesc] = useState('');
+  // const [status, setStatus] = useState('');
+  const [last_audit_date, setLastAuditDate] = useState('');
+  const [next_audit_date, setNextAuditDate] = useState('');
+    const [desc, setDesc] = useState('');
   const [appRights, setAppRights] = useState(['']);  // Initial state with one input field
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+useEffect(() => {
+  fetch('http://localhost:3000/frequency')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch frequencies');
+      }
+      // console.log(response);  // Log response object
+      return response.json();
+    })
+    .then((data) => {
+      console.log('Fetched data:', data);
+      setFrequencies(data);
+    })
+    .catch((error) => {
+      console.error('Error fetching frequencies:', error);
+    });
+}, []);
+
+
+const handleFrequencyChange = (e) => {
+  setSelectedFrequency(e.target.value); // Set selected frequency ID
+};
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +46,10 @@ const CreateUser = () => {
     const newUser = {
       appName,
       roles,
-      status,
-      lastReviewed,
+      // status,
+      frequency_id: selectedFrequency, // Save the selected frequency ID as reference
+      next_audit_date,
+      last_audit_date,
       desc,
       app_rights: appRights.filter(right => right.trim() !== '')  // Remove empty inputs
     };
@@ -32,7 +58,7 @@ const CreateUser = () => {
       const response = await axios.post('http://localhost:3000/creating', newUser);
       console.log('User Created:', response.data);
     } catch (err) {
-      setError('Failed to create user. Please try again.');
+      setError('Failed to create  Please try again.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -93,6 +119,18 @@ const CreateUser = () => {
             </div>
 
             <div className="mb-3">
+            <label>Select Frequency:</label>
+        <select value={selectedFrequency} onChange={handleFrequencyChange}>
+          <option value="">-- Select Frequency --</option>
+          {frequencies.map(frequency => (
+            <option key={frequency._id} value={frequency._id}>
+              {frequency.name}
+            </option>
+          ))}
+        </select>
+            </div>
+
+            <div className="mb-3">
               <label htmlFor="app_rights" className="form-label">Application Rights</label>
               {appRights.map((right, index) => (
                 <div key={index} className="d-flex mb-2">
@@ -123,7 +161,7 @@ const CreateUser = () => {
               </button>
             </div>
 
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <label htmlFor="status" className="form-label">Status</label>
               <select
                 id="status"
@@ -136,19 +174,32 @@ const CreateUser = () => {
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-            </div>
+            </div> */}
 
             <div className="mb-3">
-              <label htmlFor="lastReviewed" className="form-label">Last Reviewed Date</label>
+              <label htmlFor="last_audit_date" className="form-label">Last Audit Date</label>
               <input
                 type="date"
-                id="lastReviewed"
-                className="form-control"
-                value={lastReviewed}
-                onChange={(e) => setLastReviewed(e.target.value)}
+                id="last_audit_date"
+                className="form-control"last_audit_date
+                value={last_audit_date}
+                onChange={(e) => setLastAuditDate(e.target.value)}
                 required
               />
             </div>
+
+            <div className="mb-3">
+              <label htmlFor="next_audit_date" className="form-label">Next Audit Date</label>
+              <input
+                type="date"
+                id="next_audit_date"
+                className="form-control"next_audit_date
+                value={next_audit_date}
+                onChange={(e) => setNextAuditDate(e.target.value)}
+                required
+              />
+            </div>
+
 
             <div className="mb-3">
               <label htmlFor="desc" className="form-label">Description/Notes</label>
@@ -172,4 +223,4 @@ const CreateUser = () => {
   );
 };
 
-export default CreateUser;
+export default CreateApp;

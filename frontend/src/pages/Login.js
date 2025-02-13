@@ -11,7 +11,7 @@ function Login() {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        axios.post("http://localhost:3000/login", { email, password })
+         axios.post("http://localhost:3000/login", { email, password })
             .then(result => {
                 console.log(result);
                 if (result.data.success) {
@@ -25,6 +25,7 @@ function Login() {
                 setError("Login failed. Please try again.");
             });
     };
+    
 
     return (
         <div className="d-flex justify-content-center align-items-center bg-secondary vh-100">
