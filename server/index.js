@@ -9,11 +9,10 @@ const AuditModel = require('./models/Audit')
 
 // require("dotenv").config();
 
-
-const roleMiddleware = require('./middleware/roleMiddleware'); // Import roleMiddleware
-
 const moment = require("moment");
-
+const jwt = require('jsonwebtoken');
+const secretKey = 'your-secret-key';
+const checkAuth = require('./middleware/auth');
 
 
 const app = express()
@@ -97,8 +96,9 @@ app.post("/creating",  (req, res) => {
       });
 
 
-    app.post("/login", async (req, res) => {
-      const { email, password } = req.body;
+app.post("/login", async (req, res) => {
+  
+  const { email, password } = req.body;
 
   try {
     const user = await UserModel.findOne({ email: email });
@@ -111,7 +111,11 @@ app.post("/creating",  (req, res) => {
       return res.json({ success: false, message: "Incorrect password" });
     }
 
-    return res.json({ success: true, message: "Login successful" });
+    const token = jwt.sign({ userId: user._id, email: user.email }, secretKey, {
+      expiresIn: '1h',
+    });
+
+    return res.json({ success: true, message: "Login successful", token: token, userId: user._id});
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

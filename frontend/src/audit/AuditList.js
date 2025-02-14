@@ -33,10 +33,11 @@ const AuditList = () => {
             <th>Frequency</th>
             <th>HOD</th>
             <th>Application</th>
-            <th>Audit Date</th>
-            <th>Inactive</th>
+            {/* <th>Audit Date</th> */}
             <th>Rights</th>
+            {/* <th>Rights</th> */}
             <th>Reviewer Remarks</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -46,6 +47,7 @@ const AuditList = () => {
         {/* <td>{audit.emp_id?.name}</td> */}
         <td>{audit.frequency_id[0].name}</td>
         <td>{audit.user_id?.name}</td>
+        <td>{audit.application_id.appName}</td>
         <td>
           {audit.application_id?.app_rights
             ? Object.entries(audit.application_id.app_rights).map(([key, value]) => (
@@ -53,22 +55,28 @@ const AuditList = () => {
                   {key}: 
                   <input
                     type="checkbox"
-                    checked={value}
-                    onChange={(e) => {
-                      // Handle checkbox change here
-                      const newValue = e.target.checked;
-                      console.log(`${key} is now ${newValue}`);
-                      // You can update the state or make an API call here
-                    }}
+                    // checked={value}
+                    // onChange={(e) => {
+                    //   // Handle checkbox change here
+                    //   const newValue = e.target.checked;
+                    //   console.log(`${key} is now ${newValue}`);
+                    //   // You can update the state or make an API call here
+                    // }}
                   />
                 </div>
               ))
             : "No rights"}
+            <button> Revoke Access </button>
+            <button> Continue Access </button>
+            <button> Grant All Access </button>
+
         </td>
-        <td>{audit.audit_date}</td>
-        <td>{audit.inactive ? "Yes" : "No"}</td>
-        <td>{audit.rights}</td>
-        <td>{audit.reviewer_remarks}</td>
+        {/* <td>{audit.audit_date}</td> */}
+        {/* <td>{audit.rights}</td> */}
+        <td>
+          <textarea placeholder='Comments'></textarea>
+        </td>
+        <td><button>Submit</button></td>
       </tr>
     ))
   ) : (
