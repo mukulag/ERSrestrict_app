@@ -25,7 +25,7 @@ const AddUser = () => {
 
     try {
       const response = await axios.post('http://localhost:3000/register', newUser);
-      setSuccess('User created successfully!');
+      setSuccess('HOD/Reviewer created successfully!');
       setName('');
       setEmail('');
       setPassword('');
@@ -42,13 +42,13 @@ const AddUser = () => {
       <div className="content-wrapper">
         <Sidebar />
         <div className="container mt-5">
-          <h2>Add New User</h2>
+          <h2>Add New HOD/Reviewer</h2>
           {error && <p className="text-danger">{error}</p>}
           {success && <p className="text-success">{success}</p>}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="name" className="form-label">User Name</label>
+              <label htmlFor="name" className="form-label">Name</label>
               <input
                 type="text"
                 id="name"
@@ -60,7 +60,7 @@ const AddUser = () => {
             </div>
 
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">User Email</label>
+              <label htmlFor="email" className="form-label">Email</label>
               <input
                 type="email"
                 id="email"
@@ -83,7 +83,7 @@ const AddUser = () => {
               />
             </div>
 
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <label htmlFor="company_name" className="form-label">Company Name</label>
               <input
                 type="text"
@@ -92,24 +92,9 @@ const AddUser = () => {
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
               />
-            </div>
+            </div> */}
 
-            <div className="mb-3">
-              <label htmlFor="role" className="form-label">Role</label>
-              <select
-                id="role"
-                className="form-control"
-                value={role}
-                onChange={(e) => setRole(Number(e.target.value))}
-                required
-              >
-                <option value="">Select Role</option>
-                <option value="1">HOD</option>
-                <option value="2">Normal</option>
-              </select>
-            </div>
-
-            <button type="submit" className="btn btn-primary">Add User</button>
+            <button type="submit" className="btn btn-primary">Add HOD/Reviewer</button>
           </form>
         </div>
       </div>

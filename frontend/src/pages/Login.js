@@ -2,19 +2,25 @@ import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import React, { Component }  from 'react';
+import { useAuth } from "../auth/AuthContext";
+
 
 function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const { login } = useAuth();
+
 
     const handleLogin = (e) => {
         e.preventDefault();
          axios.post("http://localhost:3000/login", { email, password })
             .then(result => {
-                console.log(result);
+                
                 if (result.data.success) {
+                    
+                    login(result.data.user);
                     navigate("/dashboard"); // Redirect after successful login
                 } else {
                     setError("Invalid email or password"); // Show error message

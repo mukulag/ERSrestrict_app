@@ -6,8 +6,8 @@ const FrequencySchema = new mongoose.Schema({
     trigger_days:String,
     created_at: { type: Date, default: Date.now }, 
     updated_at: { type: Date, default: Date.now }, 
-    deleted_at: { type: Date, default: null }, 
-    status: { type: Boolean, default: true } })
+    deleted_at: { type: Date, default: null }
+ })
 
 
 const FrequencyModel = mongoose.model("frequency" ,FrequencySchema)

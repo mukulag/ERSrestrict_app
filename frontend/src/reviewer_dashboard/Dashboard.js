@@ -1,7 +1,8 @@
 import React from 'react';
-import Navbar from './Navbar';  // Assuming you have a Navbar component
-import Sidebar from './Sidebar';  // Assuming you have a Sidebar component
+import Navbar from '../components/Navbar';  // Assuming you have a Navbar component
+import Sidebar from '../components/Sidebar';  // Assuming you have a Sidebar component
 import AuditList from '../audit/AuditList';  // Import the AuditList component
+import PendingAuditList from '../audit/PendingAuditList';
 
 const Dashboard = () => {
   return (
@@ -10,12 +11,8 @@ const Dashboard = () => {
       <div className="content-wrapper">
         <Sidebar />
         <div className="dashboard-container">
-          <div className="dashboard-header">
-            <h1>Welcome to the HOD Dashboard!</h1>
-            <p>HOD.</p>
-          </div>
           {/* Add AuditList to the dashboard */}
-          <AuditList />
+          <PendingAuditList/>
         </div>
       </div>
     </div>

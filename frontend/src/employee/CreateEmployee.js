@@ -13,7 +13,7 @@ const EmployeeForm = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:3000/register')
+    fetch('http://localhost:3000/hods')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch register');
@@ -92,7 +92,7 @@ const EmployeeForm = () => {
 
             <div className="mb-3">
             <label>Select HOD:</label>
-        <select value={selectedUser} onChange={handleUserChange}>
+        <select value={selectedUser} onChange={handleUserChange} className='form-control'>
           <option value="">-- Select HOD --</option>
           {users.map(user => (
             <option key={user._id} value={user._id}>

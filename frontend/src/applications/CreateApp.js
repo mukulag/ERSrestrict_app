@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import { Navigate, useNavigate } from 'react-router-dom';
 const CreateApp = () => {
   const [frequencies, setFrequencies] = useState([]);  // To hold frequency data
   const [selectedFrequency, setSelectedFrequency] = useState('');  // Store selected frequency ID
@@ -10,10 +11,11 @@ const CreateApp = () => {
   // const [status, setStatus] = useState('');
   const [last_audit_date, setLastAuditDate] = useState('');
   const [next_audit_date, setNextAuditDate] = useState('');
-    const [desc, setDesc] = useState('');
+  const [desc, setDesc] = useState('');
   const [appRights, setAppRights] = useState(['']);  // Initial state with one input field
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState('');
 
 useEffect(() => {
   fetch('http://localhost:3000/frequency')
@@ -34,8 +36,20 @@ useEffect(() => {
 }, []);
 
 
-const handleFrequencyChange = (e) => {
-  setSelectedFrequency(e.target.value); // Set selected frequency ID
+const handleFrequencyChange = async (e) => {
+  const frequencyId = e.target.value;
+  setSelectedFrequency(frequencyId);
+
+  try {
+    const response = await axios.get('http://localhost:3000/getNextAuditDate',{
+      params: { frequency_id: frequencyId }  // Send frequency_id in the query parameters
+    });
+    setNextAuditDate(response.data.message);  // Set the next audit date from the API response
+    setError('');  // Clear any previous error
+  } catch (err) {
+    setError('Failed to fetch the next audit date');
+    setNextAuditDate(null);
+  }
 };
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -47,16 +61,16 @@ const handleFrequencyChange = (e) => {
       appName,
       roles,
       // status,
-      frequency_id: selectedFrequency, // Save the selected frequency ID as reference
-      next_audit_date,
-      last_audit_date,
+      frequency_id: selectedFrequency, // Save the selected frequency ID as referenc
       desc,
       app_rights: appRights.filter(right => right.trim() !== '')  // Remove empty inputs
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/creating', newUser);
-      console.log('User Created:', response.data);
+      const response = await axios.post('http://localhost:3000/createApplication', newUser);
+      setSuccess('Application created successfully');
+   
+      setError('');
     } catch (err) {
       setError('Failed to create  Please try again.');
       console.error(err);
@@ -90,11 +104,12 @@ const handleFrequencyChange = (e) => {
         <Sidebar />
         <div className="container mt-5">
           <h2>Add new Application</h2>
+          {success && <p className="text-success">{success}</p>}
           {error && <p className="text-danger">{error}</p>}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="appName" className="form-label">Application Name</label>
+              <label htmlFor="appName" className="form-label">Name</label>
               <input
                 type="text"
                 id="appName"
@@ -106,28 +121,25 @@ const handleFrequencyChange = (e) => {
             </div>
 
             <div className="mb-3">
-              <label htmlFor="roles" className="form-label">Roles</label>
-              <input
-                type="text"
-                id="roles"
-                className="form-control"
-                value={roles}
-                onChange={(e) => setRoles(e.target.value)}
-                required
-                placeholder="Separate roles by commas (e.g., Admin, User)"
-              />
-            </div>
-
-            <div className="mb-3">
-            <label>Select Frequency:</label>
-        <select value={selectedFrequency} onChange={handleFrequencyChange}>
-          <option value="">-- Select Frequency --</option>
-          {frequencies.map(frequency => (
-            <option key={frequency._id} value={frequency._id}>
-              {frequency.name}
-            </option>
-          ))}
-        </select>
+            <label>Frequency:</label>
+            <select required value={selectedFrequency} onChange={handleFrequencyChange} className='form-control'>
+              <option value="" selected disabled>Select</option>
+              {frequencies.map(frequency => (
+                <option key={frequency._id} value={frequency._id}>
+                  {frequency.name}
+                </option>
+              ))}
+            </select>
+            {next_audit_date && (
+        <small>
+          Next Review Date Would Be: <b>{ new Date(next_audit_date).toLocaleDateString('en-US', {
+  weekday: 'long', // e.g. 'Monday'
+  year: 'numeric', // e.g. '2025'
+  month: 'long', // e.g. 'February'
+  day: 'numeric' // e.g. '17'
+})}</b>
+        </small>
+      )}
             </div>
 
             <div className="mb-3">
@@ -160,46 +172,6 @@ const handleFrequencyChange = (e) => {
                 +
               </button>
             </div>
-
-            {/* <div className="mb-3">
-              <label htmlFor="status" className="form-label">Status</label>
-              <select
-                id="status"
-                className="form-control"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                required
-              >
-                <option value="">Select Status</option>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div> */}
-
-            <div className="mb-3">
-              <label htmlFor="last_audit_date" className="form-label">Last Audit Date</label>
-              <input
-                type="date"
-                id="last_audit_date"
-                className="form-control"last_audit_date
-                value={last_audit_date}
-                onChange={(e) => setLastAuditDate(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="next_audit_date" className="form-label">Next Audit Date</label>
-              <input
-                type="date"
-                id="next_audit_date"
-                className="form-control"next_audit_date
-                value={next_audit_date}
-                onChange={(e) => setNextAuditDate(e.target.value)}
-                required
-              />
-            </div>
-
 
             <div className="mb-3">
               <label htmlFor="desc" className="form-label">Description/Notes</label>

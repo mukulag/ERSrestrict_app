@@ -6,10 +6,6 @@ const AppSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  roles: {
-    type: String, // If it's a string with comma-separated roles or a list of roles, you may want to adjust this accordingly.
-    required: true
-  },
   
   frequency_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'frequency' }],
 
@@ -23,7 +19,7 @@ const AppSchema = new mongoose.Schema({
   },
   last_audit_date: {
     type: Date, // You can store this as a Date to handle date and time.
-    required: true
+    default: null,
   },
   desc: {
     type: String,

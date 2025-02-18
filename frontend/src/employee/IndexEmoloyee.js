@@ -27,6 +27,11 @@ const EmployeeIndex = () => {
         <Sidebar />
         <div className="container mt-5">
           <h2>Employee List</h2>
+          <a href='/employees/create'>
+            <button  className='btn btn-md btn-primary'>Create New Employee</button>
+          </a>
+          <br/>
+          <br/>
           {error && <p className="text-danger">{error}</p>}
 
           <table className="table table-bordered">
