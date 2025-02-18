@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.json())
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/")
+mongoose.connect("mongodb://127.0.0.1:27017/ahmi")
 
 
 async function calculateNextAuditDate(frequency_id){
@@ -508,6 +508,48 @@ app.post('/excelUpload', async (req, res) => {
         message: "All items contain valid values in the schemas."
     });
 });
+
+app.get('/total-users', async (req, res) => {
+  try {
+    const userCount = await AppModel.countDocuments(); // Count total users in the 'users' collection
+    res.json({ count: userCount });
+  } catch (error) {
+    console.error('Error fetching user count:', error);
+    res.status(500).json({ error: 'Failed to fetch user count' });
+  }
+});
+
+
+app.get('/count-hods', async (req, res) => {
+  try {
+    const empcount = await EmployeeModel.countDocuments(); // Counting only HODs
+    res.json({ count: empcount });
+  } catch (error) {
+    console.error('Error fetching user empcount:', error);
+    res.status(500).json({ error: 'Failed to fetch user empcount' });
+  }
+});
+
+app.get('/count-freq', async (req, res) => {
+  try {
+    const empFreq = await FrequencyModel.countDocuments(); // Counting only HODs
+    res.json({ count: empFreq });
+  } catch (error) {
+    console.error('Error fetching user empFreq:', error);
+    res.status(500).json({ error: 'Failed to fetch user empFreq' });
+  }
+});
+
+app.get('/count-review', async (req, res) => {
+  try {
+    const review = await AuditModel.countDocuments(); // Counting only HODs
+    res.json({ count: review });
+  } catch (error) {
+    console.error('Error fetching user review:', error);
+    res.status(500).json({ error: 'Failed to fetch user review' });
+  }
+});
+
 
 
 app.listen(3000, () =>{

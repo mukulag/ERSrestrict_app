@@ -1,9 +1,76 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles.css';
 import Navbar from "../components/Navbar";
 import Sidebar from '../components/Sidebar';
 // Dashboard component
 const Dashboard = () => {
+  const [totalUsers, setTotalUsers] = useState(null);
+  const [totalEmp, setTotalEmp] = useState(null);
+  const [totalFreq, setTotalfreq] = useState(null);
+  const [totalReview, setTotalreview] = useState(null);
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        // Replace with your actual API URL
+        const response = await fetch('http://localhost:3000/total-users');
+        const data = await response.json();
+        setTotalUsers(data.count); // Assuming the API returns a count field
+      } catch (error) {
+        console.error('Error fetching user count:', error);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
+
+  useEffect(() => {
+    const fetchEmpCount = async () => {
+      try {
+        // Replace with your actual API URL
+        const response = await fetch('http://localhost:3000/count-hods');
+        const data = await response.json();
+        setTotalEmp(data.count); // Assuming the API returns a count field
+      } catch (error) {
+        console.error('Error fetching user Emp:', error);
+      }
+    };
+
+    fetchEmpCount();
+  }, []);
+  
+
+  useEffect(() => {
+    const fetchFreqCount = async () => {
+      try {
+        // Replace with your actual API URL
+        const response = await fetch('http://localhost:3000/count-freq');
+        const data = await response.json();
+        setTotalfreq(data.count); // Assuming the API returns a count field
+      } catch (error) {
+        console.error('Error fetching user Emp:', error);
+      }
+    };
+
+    fetchFreqCount();
+  }, []);
+
+  useEffect(() => {
+    const fetchReviewCount = async () => {
+      try {
+        // Replace with your actual API URL
+        const response = await fetch('http://localhost:3000/count-review');
+        const data = await response.json();
+        setTotalreview(data.count); // Assuming the API returns a count field
+      } catch (error) {
+        console.error('Error fetching user setTotalreview:', error);
+      }
+    };
+
+    fetchReviewCount();
+  }, []);
+
+
   return (
     <div className="app">
     <Navbar />
@@ -11,30 +78,46 @@ const Dashboard = () => {
       <Sidebar />
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Welcome to the Dashboard!</h1>
-        <p>Your overview of the application.</p>
+        <h1>Welcome to the Admin Dashboard!</h1>
+        <p>Your overview of the Admin Dashboard.</p>
       </div>
 
-      <div className="dashboard-content">
+      <div className="dashboard-content" >
         <div className="dashboard-card">
           <h3>Total Application</h3>
-          <p>150</p>
+          {totalUsers !== null ? (
+          <p>{totalUsers}</p>
+        ) : (
+          <p>Loading...</p>
+        )}
+                </div>
+
+        <div className="dashboard-card">
+          <h3>Total Emp</h3>
+          {totalEmp !== null ? (
+          <p>{totalEmp}</p>
+        ) : (
+          <p>Loading...</p>
+        )}
         </div>
 
         <div className="dashboard-card">
-          <h3>Total HODS</h3>
-          <p>80</p>
-        </div>
-
-        <div className="dashboard-card">
-          <h3>No of Restrict</h3>
-          <p>120</p>
+          <h3>No of Reviews</h3>
+          {totalReview !== null ? (
+          <p>{totalReview}</p>
+        ) : (
+          <p>Loading...</p>
+        )}    
         </div>
 
         <div className="dashboard-card">
           <h3>Total Frequency</h3>
-          <p>$12,500</p>
-        </div>
+          {totalFreq !== null ? (
+          <p>{totalFreq}</p>
+        ) : (
+          <p>Loading...</p>
+        )}    
+            </div>
       </div>
 
       <div className="dashboard-footer">
@@ -46,6 +129,7 @@ const Dashboard = () => {
     </div>
 
   );
+
 };
 
 export default Dashboard;
