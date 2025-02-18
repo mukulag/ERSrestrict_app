@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 const AddUser = () => {
   const [name, setName] = useState('');
@@ -11,6 +12,7 @@ const AddUser = () => {
   const [role, setRole] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,14 +27,20 @@ const AddUser = () => {
 
     try {
       const response = await axios.post('http://localhost:3000/register', newUser);
-      setSuccess('HOD/Reviewer created successfully!');
-      setName('');
-      setEmail('');
-      setPassword('');
-      setCompanyName('');
-      setRole(null);
+      Swal.fire({
+        title: "HOD Created Successfully",
+        text: "Do you want to proceed with adding this HOD?",
+        icon: "success",
+      }).then((result) => {
+        window.location.href = "/hods";
+      });
+
+      setError('');
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Error occurred while creating user');
+      setError('Failed to create  Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

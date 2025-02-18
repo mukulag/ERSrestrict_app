@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from "../components/Navbar";
 import Sidebar from '../components/Sidebar';
+import Swal from "sweetalert2";
 
 const EmployeeForm = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-    const [users, setUsers] = useState([]);  // To hold frequency data
-    const [selectedUser, setSelectedUser] = useState('');  // Store selected frequency ID
+  const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState([]);  // To hold frequency data
+  const [selectedUser, setSelectedUser] = useState('');  // Store selected frequency ID
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -38,20 +40,26 @@ const EmployeeForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newEmployee = { name, email, 
+      const newEmployee = {
+        name, email,
         user_id: selectedUser // Add the selected user (HOD ID) here
 
       };
       const response = await axios.post('http://localhost:3000/employee', newEmployee);
-      setSuccess('New employee added successfully');
-      setName('');
-      setEmail('');
-      setSelectedUser(''); // Clear the selected user (HOD)
+      Swal.fire({
+        title: "Employee Created Successfully",
+        text: "Do you want to proceed with adding this employee?",
+        icon: "success",
+      }).then((result) => {
+        window.location.href = "/employees";
+      });
 
       setError('');
     } catch (err) {
-      setError('Error adding new employee.');
-      setSuccess('');
+      setError('Failed to create  Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,15 +99,15 @@ const EmployeeForm = () => {
             </div>
 
             <div className="mb-3">
-            <label>Select HOD:</label>
-        <select value={selectedUser} onChange={handleUserChange} className='form-control'>
-          <option value="">-- Select HOD --</option>
-          {users.map(user => (
-            <option key={user._id} value={user._id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
+              <label>Select HOD:</label>
+              <select value={selectedUser} onChange={handleUserChange} className='form-control'>
+                <option value="">-- Select HOD --</option>
+                {users.map(user => (
+                  <option key={user._id} value={user._id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
 

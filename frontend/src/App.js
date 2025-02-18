@@ -40,6 +40,7 @@ import Audit from './audit/create_audit';
 import RoleBasedDashboard from './pages/RoleBasedDashboard';
 import AuditList from './audit/AuditList';
 import UploadExcel from './excel/UploadExcel';
+import ChangePassword from './reviewer_dashboard/changepass';
 
 function App() {
   
@@ -49,7 +50,7 @@ function App() {
     <AuthProvider>
        <Router>
         <Routes>
-          
+        <Route path="/change-password" element={<ChangePassword />} />
           <Route path='/register' element={<Signup />}></Route>
           <Route path='/' element={isAuthenticated ? <Navigate to="/dashboard"/> : <Login />}></Route>
           

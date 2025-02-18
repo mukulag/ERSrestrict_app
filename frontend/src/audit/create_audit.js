@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import Swal from "sweetalert2";
 
 const CreateAuditForm = () => {
   const [empId, setEmpId] = useState('');
@@ -25,7 +26,8 @@ const CreateAuditForm = () => {
   const [employees, setEmployees] = useState([]);
   const [users, setUsers] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [selectedRights, setSelectedRights] = useState([])
+  const [selectedRights, setSelectedRights] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // fetch employees
@@ -101,16 +103,25 @@ const CreateAuditForm = () => {
 
     try {
       const response = await axios.post('http://localhost:3000/audit', newAudit);
-      setSuccess('Review created successfully');
+      Swal.fire({
+        title: "Review Created Successfully",
+        text: "Do you want to proceed with adding this review?",
+        icon: "success",
+      }).then((result) => {
+        window.location.href = "/create_audit";
+      });
+
       setError('');
     } catch (err) {
-      setError('Error creating audit');
-      setSuccess('');
+      setError('Failed to create  Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleApplicationChange = async (e) => {
-    
+
     const applicationId = e.target.value;
     setApplicationId(applicationId);
     setSelectedRights("");
@@ -119,8 +130,8 @@ const CreateAuditForm = () => {
       const response = await axios.get('http://localhost:3000/getApplicationDataForReview', {
         params: { application_id: applicationId }  // Send frequency_id in the query parameters
       });
-      setAppRights(response.data.message.app_rights);  
-      setNextAuditDate(response.data.nextAuditDate);  
+      setAppRights(response.data.message.app_rights);
+      setNextAuditDate(response.data.nextAuditDate);
       setError('');  // Clear any previous error
     } catch (err) {
       setError('Failed to fetch the next audit date' + err);
@@ -137,67 +148,67 @@ const CreateAuditForm = () => {
 
   return (
     <div className="app">
-    <Navbar />
-    <div className="content-wrapper">
-      <Sidebar />
-      <div className="container mt-5">
-      <h2>Create New Review</h2>
+      <Navbar />
+      <div className="content-wrapper">
+        <Sidebar />
+        <div className="container mt-5">
+          <h2>Create New Review</h2>
 
-      {error && <p className="text-danger">{error}</p>}
-      {success && <p className="text-success">{success}</p>}
+          {error && <p className="text-danger">{error}</p>}
+          {success && <p className="text-success">{success}</p>}
 
-      <form onSubmit={handleSubmit}>
-      <div className="mb-3">
-          <label>Select Application:</label>
-          <select value={applicationId} onChange={handleApplicationChange} className='form-control' required>
-            <option value="" selected disabled>Select</option>
-            {applications.map((application) => (
-              <option key={application._id} value={application._id}>
-                {application.appName}
-              </option>
-            ))}
-          </select>
-        {next_audit_date && (
-        <small>
-          Next Review Date: <b>{ new Date(next_audit_date).toLocaleDateString('en-US', {
-  weekday: 'long', // e.g. 'Monday'
-  year: 'numeric', // e.g. '2025'
-  month: 'long', // e.g. 'February'
-  day: 'numeric' // e.g. '17'
-})}</b>
-        </small>
-      )}   
-      
-      </div>
-        <div className="mb-3">
-          <label>Select Employee:</label>
-          <select value={empId} onChange={(e) => setEmpId(e.target.value)} className='form-control' required>
-            <option value="" selected disabled>Select</option>
-            {employees.map((emp) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label>Select Application:</label>
+              <select value={applicationId} onChange={handleApplicationChange} className='form-control' required>
+                <option value="" selected disabled>Select</option>
+                {applications.map((application) => (
+                  <option key={application._id} value={application._id}>
+                    {application.appName}
+                  </option>
+                ))}
+              </select>
+              {next_audit_date && (
+                <small>
+                  Next Review Date: <b>{new Date(next_audit_date).toLocaleDateString('en-US', {
+                    weekday: 'long', // e.g. 'Monday'
+                    year: 'numeric', // e.g. '2025'
+                    month: 'long', // e.g. 'February'
+                    day: 'numeric' // e.g. '17'
+                  })}</b>
+                </small>
+              )}
 
-        <div className="mb-3">
-          <label>Select HOD/Reviewer:</label>
-          <select value={userId} onChange={(e) => setUserId(e.target.value)} className='form-control'>
-            <option value="" selected disabled>Select</option>
-            {users.map((user) => (
-              <option key={user._id} value={user._id}>
-                {user.name}
-              </option>
-            ))}
-          </select>
-        </div>
+            </div>
+            <div className="mb-3">
+              <label>Select Employee:</label>
+              <select value={empId} onChange={(e) => setEmpId(e.target.value)} className='form-control' required>
+                <option value="" selected disabled>Select</option>
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        
-          
-        <div className="mb-3">
-          <label htmlFor="rights" className="form-label">Include Rights:</label><br></br>
-           {/*
+            <div className="mb-3">
+              <label>Select HOD/Reviewer:</label>
+              <select value={userId} onChange={(e) => setUserId(e.target.value)} className='form-control'>
+                <option value="" selected disabled>Select</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
+
+            <div className="mb-3">
+              <label htmlFor="rights" className="form-label">Include Rights:</label><br></br>
+              {/*
           <textarea
             id="rights"
             className="form-control"
@@ -206,31 +217,31 @@ const CreateAuditForm = () => {
           />
     
          */}
-         {appRights.length > 0 ? (
-          appRights.map((right, index) => (
-            <div key={index}>
-              <input
-                type="checkbox"
-                id={`right-${index}`}
-                name={`right-${right}`}
-                value={right}
-                onChange={handleCheckboxChange}
-              />
-              &nbsp;
-              <label htmlFor={`right-${index}`}>{right}</label>
-            </div>
-          ))
-        ) : (
-          <small className='text-muted'>Select Application First</small>
-        )}
+              {appRights.length > 0 ? (
+                appRights.map((right, index) => (
+                  <div key={index}>
+                    <input
+                      type="checkbox"
+                      id={`right-${index}`}
+                      name={`right-${right}`}
+                      value={right}
+                      onChange={handleCheckboxChange}
+                    />
+                    &nbsp;
+                    <label htmlFor={`right-${index}`}>{right}</label>
+                  </div>
+                ))
+              ) : (
+                <small className='text-muted'>Select Application First</small>
+              )}
             </div>
 
-        <button type="submit" className="btn btn-primary">Create Audit</button>
-      </form>
+            <button type="submit" className="btn btn-primary">Create Audit</button>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-// TODO
+    // TODO
   );
 };
 

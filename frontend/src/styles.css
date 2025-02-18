@@ -118,4 +118,88 @@ body {
     font-size: 0.875rem;
     color: #aaa;
   }
-  
+  /* Change Password Page - Unique Classes */
+
+.change-password-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.change-password-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.change-password-form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.change-password-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.change-password-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.change-password-message {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.change-password-input-group {
+  margin-bottom: 15px;
+}
+
+.change-password-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.change-password-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.change-password-button {
+  width: 100%;
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.change-password-button:hover {
+  background-color: #2563eb;
+}
+
+.change-password-button:disabled {
+  background-color: #a5b4fc;
+  cursor: not-allowed;
+}

@@ -3,6 +3,8 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { Navigate, useNavigate } from 'react-router-dom';
+import Swal from "sweetalert2";
+
 const CreateApp = () => {
   const [frequencies, setFrequencies] = useState([]);  // To hold frequency data
   const [selectedFrequency, setSelectedFrequency] = useState('');  // Store selected frequency ID
@@ -68,8 +70,15 @@ const handleFrequencyChange = async (e) => {
 
     try {
       const response = await axios.post('http://localhost:3000/createApplication', newUser);
-      setSuccess('Application created successfully');
-   
+
+      Swal.fire({
+        title: "Application Created Successfullly",
+        text: "Do you want to proceed with adding this application?",
+        icon: "success",
+      }).then((result) => {
+        window.location.href="/app";
+      });
+
       setError('');
     } catch (err) {
       setError('Failed to create  Please try again.');

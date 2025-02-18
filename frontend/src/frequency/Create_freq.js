@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Navbar from "../components/Navbar";
 import Sidebar from '../components/Sidebar';
+import Swal from "sweetalert2";
+
 
 const FrequencyForm = () => {
   const [name, setName] = useState('');
@@ -10,6 +12,7 @@ const FrequencyForm = () => {
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -18,15 +21,20 @@ const FrequencyForm = () => {
     try {
       const newFrequency = { name, interval_days, trigger_days, status };
       const response = await axios.post('http://localhost:3000/frequency', newFrequency);
-      setSuccess('New frequency created successfully');
-      setName('');
-      setIntervalDays('');
-      setTriggerDays('');
-      setStatus('');
+      Swal.fire({
+        title: "Frequency Created Successfully",
+        text: "Do you want to proceed with adding this frequency?",
+        icon: "success",
+      }).then((result) => {
+        window.location.href = "/frequency";
+      });
+
       setError('');
     } catch (err) {
-      setError('Error creating new frequency.');
-      setSuccess('');
+      setError('Failed to create  Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
