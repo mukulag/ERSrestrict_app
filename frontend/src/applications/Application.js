@@ -74,7 +74,7 @@ function App() {
           <span className="text-muted">No rights assigned</span>
         )}
       </td>
-      <td>
+      {/* <td>
         <button className="btn btn-primary">
           <i className="fa fa-pencil" aria-hidden="true"></i> Edit
         </button>
@@ -84,7 +84,7 @@ function App() {
         <button className="btn btn-danger" onClick={() => handleDelete(app.id)}>
           <i className="fa fa-trash-o" aria-hidden="true"></i> Delete
         </button>
-      </td>
+      </td> */}
     </tr>
   ))}
 </tbody>

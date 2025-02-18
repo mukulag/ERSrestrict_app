@@ -27,7 +27,7 @@ const EmployeeIndex = () => {
         <Sidebar />
         <div className="container mt-5">
           <h2>Employee List</h2>
-          <a href='/employees/create'>
+          <a href='/employeescreate'>
             <button  className='btn btn-md btn-primary'>Create New Employee</button>
           </a>
           <br/>

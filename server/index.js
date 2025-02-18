@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.json())
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/saas")
+mongoose.connect("mongodb://127.0.0.1:27017/ahmisaas")
 
 
 async function calculateNextAuditDate(frequency_id){
@@ -507,29 +507,6 @@ app.post('/excelUpload', async (req, res) => {
     res.json({
         message: "All items contain valid values in the schemas."
     });
-});
-
-app.post('/change-password', async (req, res) => {
-  const { userId, oldPassword, newPassword } = req.body;
-
-  // Fetch user from database
-  const user = await UserModel.findById(userId);
-  if (!user) {
-      return res.status(404).json({ message: "User not found" });
-  }
-
-  // Check old password
-
-  if(user.password != oldPassword){
-    return res.status(400).json({ message: "Incorrect old password" });
-  }
-
-  // Hash new passwor
-  user.password = newPassword;
-  // Save new password
-  await user.save();
-  
-  res.json({ message: "Password updated successfully!" });
 });
 
 

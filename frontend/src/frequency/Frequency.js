@@ -28,12 +28,14 @@ const FrequencyIndex = () => {
       <div className="content-wrapper">
         <Sidebar />
         <div className="container mt-5">
+       
           <h2>Frequencies</h2>
-          
+          <a href='/create_frequency'>
+            <button  className='btn btn-md btn-primary'>Create New Frequency</button>
+          </a>
           {error && <p className="text-danger">{error}</p>}
          
-
-          <h3>Existing Frequencies</h3>
+        
           {frequencies.length > 0 ? (
             <table className="table">
               <thead>
@@ -41,7 +43,7 @@ const FrequencyIndex = () => {
                   <th>Frequency Name</th>
                   <th>Interval (Days)</th>
                   <th>Trigger Days</th>
-                  <th>Status</th>
+                  <th className='d-none'>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -50,7 +52,7 @@ const FrequencyIndex = () => {
                     <td>{frequency.name}</td>
                     <td>{frequency.interval_days}</td>
                     <td>{frequency.trigger_days}</td>
-                    <td>{frequency.status}</td>
+                    <td className='d-none'>{frequency.status}</td>
                   </tr>
                 ))}
               </tbody>

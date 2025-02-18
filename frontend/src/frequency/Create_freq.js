@@ -87,7 +87,7 @@ const FrequencyForm = () => {
               />
             </div>
 
-            <div className="mb-3">
+            <div className="mb-3 d-none">
               <label htmlFor="status" className="form-label">Status</label>
               <select
                 id="status"
