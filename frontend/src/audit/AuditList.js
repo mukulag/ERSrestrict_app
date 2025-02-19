@@ -15,9 +15,13 @@ const AuditList = () => {
     // Fetch all audits
     const fetchAudits = async () => {
       try {
-        console.log(user._id);
+        console.log(user.role);
+        let param = { user: user._id };
+        if(user.role == "admin"){
+          param = {user: "admin"};
+        }
         const response = await axios.get('http://localhost:3000/pastAudits', {
-          params: { user: user._id }
+          params: param
         });
 
         setAudits(response.data);

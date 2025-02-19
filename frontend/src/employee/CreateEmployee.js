@@ -48,7 +48,7 @@ const EmployeeForm = () => {
       const response = await axios.post('http://localhost:3000/employee', newEmployee);
       Swal.fire({
         title: "Employee Created Successfully",
-        text: "Do you want to proceed with adding this employee?",
+        // text: "Do you want to proceed with adding this employee?",
         icon: "success",
       }).then((result) => {
         window.location.href = "/employees";

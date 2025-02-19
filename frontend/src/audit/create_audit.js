@@ -105,7 +105,7 @@ const CreateAuditForm = () => {
       const response = await axios.post('http://localhost:3000/audit', newAudit);
       Swal.fire({
         title: "Review Created Successfully",
-        text: "Do you want to proceed with adding this review?",
+        // text: "Do you want to proceed with adding this review?",
         icon: "success",
       }).then((result) => {
         window.location.href = "/create_audit";
@@ -207,7 +207,7 @@ const CreateAuditForm = () => {
 
 
             <div className="mb-3">
-              <label htmlFor="rights" className="form-label">Include Rights:</label><br></br>
+              <label htmlFor="rights" className="form-label">Inital Rights:</label><br></br>
               {/*
           <textarea
             id="rights"

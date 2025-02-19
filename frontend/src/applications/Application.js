@@ -51,7 +51,6 @@ function App() {
 
               <th>Description Notes</th>
               <th>App Rights</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>

@@ -29,7 +29,7 @@ const AddUser = () => {
       const response = await axios.post('http://localhost:3000/register', newUser);
       Swal.fire({
         title: "HOD Created Successfully",
-        text: "Do you want to proceed with adding this HOD?",
+        // text: "Do you want to proceed with adding this HOD?",
         icon: "success",
       }).then((result) => {
         window.location.href = "/hods";

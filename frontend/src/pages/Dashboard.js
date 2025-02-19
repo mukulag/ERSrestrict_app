@@ -79,10 +79,9 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>Welcome to the Admin Dashboard!</h1>
-        <p>Your overview of the Admin Dashboard.</p>
       </div>
 
-      <div className="dashboard-content" >
+      {/* <div className="dashboard-content" >
         <div className="dashboard-card">
           <h3>Total Application</h3>
           {totalUsers !== null ? (
@@ -122,7 +121,7 @@ const Dashboard = () => {
 
       <div className="dashboard-footer">
         <p>Dashboard Overview - 2025</p>
-      </div>
+      </div> */}
     </div>
     </div>
 

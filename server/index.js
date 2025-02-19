@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.json())
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/ahmisaas")
+mongoose.connect("mongodb://127.0.0.1:27017/test")
 
 
 async function calculateNextAuditDate(frequency_id){
@@ -385,29 +385,20 @@ app.get("/pendingAudits", async (req, res) => {
 
 app.get("/pastAudits", async (req, res) => {
   try {
+    const { user } = req.query;
+    let filter = { reviewer_reviewAt: { $ne: null } };
+
+    if (user && user !== "admin") {
+      filter.user_id = user;
+    }
     // Fetch audits and use .lean() to get plain JavaScript objects
-    const audits = await AuditModel.find({
-      reviewer_reviewAt: { $ne: null } 
-    })  
-    .populate("application_id", "appName app_rights") 
-    .populate("emp_id", "name") 
+        const audits = await AuditModel.find(filter)
+        .sort({ reviewer_reviewAt: -1 })
+        .populate("application_id", "appName app_rights")
+        .populate("emp_id", "name");
  
     res.json(audits);
     return;
-    // Transform the app_rights array into an object with each right set to false
-    const transformedAudits = audits.map(audit => {
-      if (audit.application_id && audit.application_id.app_rights) {
-        // Convert the app_rights array into an object with all rights set to false
-        const appRights = audit.application_id.app_rights.reduce((acc, right) => {
-          acc[right] = false;
-          return acc;
-        }, {});
-        audit.application_id.app_rights = appRights; // Replace the array with the transformed object
-      }
-      return audit;
-    });
-
-    res.json(transformedAudits); // Send the transformed audits as a JSON response
     
   } catch (error) {
     console.error("Error fetching audits:", error);
@@ -422,6 +413,8 @@ app.post('/excelUpload', async (req, res) => {
   const data = req.body; // This will be the JSON data from the frontend
     var errorArr = [];
     var index = 0;
+    var successArr = [];
+
 
     // Iterate over each item in the data array
     for (const item of data) {
@@ -434,6 +427,10 @@ app.post('/excelUpload', async (req, res) => {
             !item.hasOwnProperty('HOD') || 
             !item.hasOwnProperty('Rights')
         ) {
+          errorArr.push({
+            Error: `Malfunction Schema Provided`,
+            row: index
+        });
             continue; // Skip this item if keys are missing
         }
 
@@ -447,7 +444,7 @@ app.post('/excelUpload', async (req, res) => {
         const appExists = await AppModel.findOne({ appName: new RegExp(`^${applicationName}$`, 'i') });
         if (!appExists) {
             errorArr.push({
-                Error: `Application "${item.Application}" not found in AppModel`,
+                Error: `Application "${item.Application}" not found in Applications`,
                 row: index
             });
             continue; // Skip to next item if 'Application' is invalid
@@ -457,7 +454,7 @@ app.post('/excelUpload', async (req, res) => {
         const employeeExists = await EmployeeModel.findOne({ name: new RegExp(`^${employeeName}$`, 'i') });
         if (!employeeExists) {
             errorArr.push({
-                Error: `Employee "${item.Employee}" not found in EmployeeModel`,
+                Error: `Employee "${item.Employee}" not found in Employees`,
                 row: index
             });
             continue; // Skip to next item if 'Employee' is invalid
@@ -467,7 +464,7 @@ app.post('/excelUpload', async (req, res) => {
         const hodExists = await UserModel.findOne({ name: new RegExp(`^${hodName}$`, 'i') });
         if (!hodExists) {
             errorArr.push({
-                Error: `HOD "${item.HOD}" not found in UserModel`,
+                Error: `HOD "${item.HOD}" not found in Users`,
                 row: index
             });
             continue; // Skip to next item if 'HOD' is invalid
@@ -488,16 +485,24 @@ app.post('/excelUpload', async (req, res) => {
         audit_date: await calculateNextAuditDate(appExists.frequency_id),
       };
     
-      AuditModel.create(newReview)
-      .then(audit => res.json(audit)) 
+      let audit = await AuditModel.create(newReview)
       .catch(err => res.status(500).json({ error: err.message })); 
+      
+      if (audit) {
+        audit = await AuditModel.findById(audit._id)
+            .populate("emp_id")
+            .populate("frequency_id")
+            .populate("user_id")
+            .populate("application_id");
 
-
+      successArr.push(audit);  
+    }
+    
     }
 
     // If errors are found, return them in the response
     if (errorArr.length > 0) {
-        return res.status(400).json({
+        return res.status(200).json({
             message: "There were errors with the data.",
             errors: errorArr
         });
@@ -505,7 +510,8 @@ app.post('/excelUpload', async (req, res) => {
 
     // If no errors, send a success response
     res.json({
-        message: "All items contain valid values in the schemas."
+        succesData: successArr,
+        errorData: errorArr
     });
 });
 

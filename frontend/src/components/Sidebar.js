@@ -40,11 +40,9 @@ const Sidebar = () => {
             <Link to="/create_audit">Create Review</Link>
           </li>
         )}
-        {user.role == "admin" && (
           <li>
-            <Link to="/hods">Past Reviews</Link>
+            <Link to="/pastReviews">Reviews Given</Link>
           </li>
-        )}
         {user.role == "admin" && (
           <li>
             <Link to="/uploadExcel">Upload Audit Excel</Link>
@@ -57,17 +55,12 @@ const Sidebar = () => {
         )}
         {user.role == "hod" && (
           <li>
-            <Link to="/pastReviews">My Past Reviews</Link>
+            <Link  className='text-muted'>My Employees</Link>
           </li>
         )}
         {user.role == "hod" && (
           <li>
-            <Link to="/myEmployees">My Employees</Link>
-          </li>
-        )}
-        {user.role == "hod" && (
-          <li>
-            <Link to="/settings">Change Password</Link>
+            <Link to="/change-password">Change Password</Link>
           </li>
         )}
         

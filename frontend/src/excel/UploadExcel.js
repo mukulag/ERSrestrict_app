@@ -6,6 +6,7 @@ import Sidebar from '../components/Sidebar';
 
 function UploadExcel() {
     const [fileData, setFileData] = useState([]);
+    const [report, setReport] = useState([]);
 
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
@@ -34,8 +35,10 @@ function UploadExcel() {
                     'Content-Type': 'application/json',
                 },
             });
+            
+            console.log(response.data);
+            setReport(response.data);
 
-            console.log('Data sent to backend successfully:', response.data);
         } catch (error) {
             console.error('Error sending data to backend:', error);
         }
@@ -51,8 +54,64 @@ function UploadExcel() {
                         <h2>Upload Excel For Reviews</h2>
                         <div>
                             <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                            <pre>{JSON.stringify(fileData, null, 2)}</pre>
+
                         </div>
+                        {report && report.succesData?.length > 0 && (
+                        <div className="container mt-4">
+                        <h3>Response Data:</h3>
+                        <h4>Successfuly Created Following Enteries:</h4>
+                        <div className="table-responsive">
+                        <table className="table table-bordered table-striped">
+                                <thead className="table-dark">
+                                    <tr>
+                                        <th>Employee Name</th>
+                                        <th>Employee Email</th>
+                                        <th>Application</th>
+                                        <th>Initial Rights</th>
+                                        <th>Audit Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {report.succesData.map((item) => (
+                                        <tr key={item._id}>
+                                            <td>{item.emp_id?.name || "N/A"}</td>
+                                            <td>{item.emp_id?.email || "N/A"}</td>
+                                            <td>{item.application_id?.appName || "N/A"}</td>
+                                            <td>{item.initialRights || "N/A"}</td>
+                                            <td>{new Date(item.audit_date).toLocaleDateString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    )}
+                    <hr></hr>
+                    {report && report.errors?.length > 0 && (
+                        <div className="container mt-4">
+                        <h4>Issues Reported While Importing:</h4>
+                        <div className="table-responsive">
+                        <table className="table table-bordered table-striped">
+                                <thead className="table-dark">
+                                    <tr>
+                                        <th>Row Index</th>
+                                        <th>Issue Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {report.errors.map((item) => (
+                                        <tr>
+                                            <td>{item.row || "N/A"}</td>
+                                            <td>{item.Error || "N/A"}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    )}
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
+import Swal from "sweetalert2";
 
 const PendingAuditList = () => {
     const { user } = useAuth();
@@ -49,8 +50,16 @@ const PendingAuditList = () => {
             };
         }
     });
+    debugger;
+    let aud; 
+    if(audit_id == undefined){
+      audit_id = e.target.dataset.auditId;
+    }
+    else{
+      aud = audit_id.split("-").pop();
+    }
 
-    updatedRights["audit"] = audit_id.split("-").pop();
+    updatedRights["audit"] = aud;
     console.log(user);
 
     debugger;
@@ -68,6 +77,16 @@ const PendingAuditList = () => {
       app: application
     }
     const response = await axios.post('http://localhost:3000/submitReview', obj);
+
+
+      Swal.fire({
+        title: "Review Given Successfullly",
+        // text: "Do you want to proceed with adding this application?",
+        icon: "success",
+      }).then((result) => {
+        window.location.href="/pastReviews";
+      });
+
 
   }
 
@@ -146,9 +165,9 @@ const PendingAuditList = () => {
         })
       : "No rights"}
       <div className='d-flex gap-2'>
-      <button className='btn btn-sm btn-primary'> Revoke All Rights </button>
+      {/* <button className='btn btn-sm btn-primary'> Revoke All Rights </button>
             <button className='btn btn-sm btn-primary'> Continue All Rights </button>
-            <button className='btn btn-sm btn-primary'> Grant All Rights </button>
+            <button className='btn btn-sm btn-primary'> Grant All Rights </button> */}
       </div>
       <input type="text" className='jsonRights' value={JSON.stringify(rights_about_to_give)}
       data-audit-id={audit._id} style={{display:'none'}}></input>
@@ -164,7 +183,7 @@ const PendingAuditList = () => {
         <td>
           <input class="emp_id" value={audit.emp_id?._id} data-audit-id={audit._id} style={{display:'none'}}></input>
           <input class="app_id" value={audit.application_id?._id} data-audit-id={audit._id} style={{display:'none'}}></input>
-          <button className='btn btn-success' onClick={ (e) => giveReview(e, audit._id)}>Submit</button></td>
+          <button className='btn btn-success' onClick={ (e) => giveReview(e, audit._id)} data-audit-id={audit._id}>Submit</button></td>
       </tr>
     ))
   ) : (

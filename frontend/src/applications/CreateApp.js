@@ -73,7 +73,7 @@ const handleFrequencyChange = async (e) => {
 
       Swal.fire({
         title: "Application Created Successfullly",
-        text: "Do you want to proceed with adding this application?",
+        // text: "Do you want to proceed with adding this application?",
         icon: "success",
       }).then((result) => {
         window.location.href="/app";

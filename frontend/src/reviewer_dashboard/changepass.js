@@ -48,11 +48,12 @@ const ChangePassword = () => {
     };
 
     return (
-        <div className="change-password-container">
-            <Sidebar />
-            <div className="change-password-content">
-                <Navbar />
-                <div className="change-password-form-wrapper">
+        <div className="app">
+      <Navbar />
+      <div className="content-wrapper">
+        <Sidebar />
+        <div className="container mt-5 d-flex justify-content-center align-items-center">
+    
                     <div className="change-password-card">
                         <h2 className="change-password-title">Change Password</h2>
                         {message && <p className="change-password-message">{message}</p>}

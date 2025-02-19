@@ -19,11 +19,11 @@ const FrequencyForm = () => {
     e.preventDefault();
 
     try {
-      const newFrequency = { name, interval_days, trigger_days, status };
+      const newFrequency = { name, interval_days, trigger_days};
       const response = await axios.post('http://localhost:3000/frequency', newFrequency);
       Swal.fire({
         title: "Frequency Created Successfully",
-        text: "Do you want to proceed with adding this frequency?",
+        // text: "Do you want to proceed with adding this frequency?",
         icon: "success",
       }).then((result) => {
         window.location.href = "/frequency";
@@ -69,8 +69,7 @@ const FrequencyForm = () => {
                 className="form-control"
                 value={interval_days}
                 onChange={(e) => setIntervalDays(e.target.value)}
-                required
-                min="1"
+                required                
               />
             </div>
 
@@ -83,24 +82,10 @@ const FrequencyForm = () => {
                 value={trigger_days}
                 onChange={(e) => setTriggerDays(e.target.value)}
                 required
-                min="1"
               />
             </div>
 
-            <div className="mb-3 d-none">
-              <label htmlFor="status" className="form-label">Status</label>
-              <select
-                id="status"
-                className="form-control"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                required
-              >
-                <option value="">Select status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
+           
 
             <button type="submit" className="btn btn-primary">Submit</button>
           </form>
