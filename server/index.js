@@ -347,15 +347,24 @@ app.post('/audit', async (req, res) => {
 
 app.get("/pendingAudits", async (req, res) => {
   try {
+
+    const { user } = req.query;
     const todayStart = moment().startOf("day").toDate(); // Get today's start time (00:00:00)
     const todayEnd = moment().endOf("day").toDate(); // Get today's end time (23:59:59)
 
-    // Fetch audits and use .lean() to get plain JavaScript objects
-    const audits = await AuditModel.find({
+    let filter = {
       status: true,         // Ensure status is true
       reviewer_rightsGiven: null, // Ensure reviewer_rightsGiven is null
       audit_date: { $gte: todayStart, $lt: todayEnd }
-    })  
+    };
+
+    if (user && user !== "admin") {
+      filter.user_id = user;
+    }
+    
+
+    // Fetch audits and use .lean() to get plain JavaScript objects
+    const audits = await AuditModel.find(filter)  
     .populate("frequency_id", "name") 
     .populate("application_id", "appName app_rights") 
     .populate("emp_id", "name") 
@@ -504,7 +513,8 @@ app.post('/excelUpload', async (req, res) => {
     if (errorArr.length > 0) {
         return res.status(200).json({
             message: "There were errors with the data.",
-            errors: errorArr
+            errors: errorArr,
+            succesData: successArr
         });
     }
 

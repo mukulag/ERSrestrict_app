@@ -14,7 +14,14 @@ const PendingAuditList = () => {
     // Fetch all audits
     const fetchAudits = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/pendingAudits');
+        console.log("test");
+        let param = { user: user._id };
+        if(user.role == "admin"){
+          param = {user: "admin"};
+        }
+        const response = await axios.get('http://localhost:3000/pendingAudits',{
+          params: param
+        });
         setAudits(response.data);
       } catch (err) {
         setError('Failed to fetch audits');
