@@ -48,6 +48,11 @@ const Sidebar = () => {
             <Link to="/uploadExcel">Upload Audit Excel</Link>
           </li>
         )}
+         {user.role == "admin" && (
+          <li>
+            <Link to="/uploademployee">Upload Employee </Link>
+          </li>
+        )}
         {user.role == "admin" && (
           <li>
             <Link to="/hods">Change Password</Link>

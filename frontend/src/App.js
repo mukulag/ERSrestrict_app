@@ -41,6 +41,8 @@ import RoleBasedDashboard from './pages/RoleBasedDashboard';
 import AuditList from './audit/AuditList';
 import UploadExcel from './excel/UploadExcel';
 import ChangePassword from './reviewer_dashboard/changepass';
+import UploadEmployees from './employee/UploadEmployees';
+import UploadHods from './hod/UploadHod';
 
 function App() {
   
@@ -122,8 +124,18 @@ function App() {
                 <UploadExcel/>
              </ProtectedRoute>
             }></Route>
+<Route path='/uploademployee' element={
+             <ProtectedRoute>
+                <UploadEmployees/>
+             </ProtectedRoute>
+            }></Route>
 
 
+<Route path='/uploadhod' element={
+             <ProtectedRoute>
+                <UploadHods/>
+             </ProtectedRoute>
+            }></Route>
           <Route path='/create_audit' element={<Audit />}></Route>
 
 

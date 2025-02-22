@@ -16,10 +16,11 @@ const AuditList = () => {
     const fetchAudits = async () => {
       try {
         console.log(user.role);
-        let param = { user: user._id };
-        if(user.role == "admin"){
+        let param = { user: user._id }; 
+        if(user.role == "admin"){ 
           param = {user: "admin"};
         }
+        
         const response = await axios.get('http://localhost:3000/pastAudits', {
           params: param
         });
@@ -65,7 +66,7 @@ const AuditList = () => {
                         <td>{audit.emp_id?.name}</td>
                         <td>{audit.application_id.appName}</td>
                         <td>
-                          {audit.application_id?.app_rights
+                          {audit.application_id?.appName
                             ? Object.entries(audit.application_id.app_rights).map(([key, value]) => {
                               
                               const givenRight = JSON.parse(audit.reviewer_rightsGiven || "{}");

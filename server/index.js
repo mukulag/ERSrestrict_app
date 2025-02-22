@@ -3,6 +3,8 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const AppModel = require('./models/Application')
 const FrequencyModel = require('./models/Frequency')
+const multer = require("multer");
+const XLSX = require("xlsx");
 const EmployeeModel = require('./models/Employee')
 const UserModel = require('./models/User')
 const AuditModel = require('./models/Audit')
@@ -318,14 +320,73 @@ app.post('/employee', (req, res) => {
 
 app.get("/employee", async (req, res) => {
   try {
-    const employee = await EmployeeModel.find().populate('user_id'); // Populate the user_id field
+    // Fetch only employees where status is null
+    const employee = await EmployeeModel.find({ status: null }).populate('user_id'); // Populate the user_id field
     res.json(employee);
   } catch (error) {
     console.error('Error fetching employee:', error); // Log the actual error
     res.status(500).json({ message: 'Error fetching employee data', error: error.message });
   }
 });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+app.post("/uploadEmployees", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
 
+    // Read the file from buffer
+    const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    // Convert sheet data to match your schema
+    const employees = data.map((row) => ({
+      name: row.Name,  
+      email: row.Email, 
+      user_id: row.User_ID,  
+    }));
+
+    await EmployeeModel.insertMany(employees);
+
+    res.status(200).json({ message: "Employees uploaded successfully" });
+  } catch (error) {
+    console.error("Upload Error:", error);
+    res.status(500).json({ message: "Error uploading employees" });
+  }
+});
+
+
+// API Endpoint to Upload HODs
+app.post("/uploadHods", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Read the file from buffer
+    const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    // Convert sheet data to match schema
+    const hods = data.map((row) => ({
+      name: row.Name,
+      email: row.Email,
+      user_id: row.User_ID,
+      role: "HOD", // Assigning "HOD" role by default
+    }));
+
+    // Insert HODs into MongoDB
+    await UserModel.insertMany(hods);
+
+    res.status(200).json({ message: "HODs uploaded successfully" });
+  } catch (error) {
+    console.error("Upload Error:", error);
+    res.status(500).json({ message: "Error uploading HODs" });
+  }
+});
 
 
 app.post('/audit', async (req, res) => {
@@ -392,10 +453,11 @@ app.get("/pastAudits", async (req, res) => {
       filter.user_id = user;
     }
     // Fetch audits and use .lean() to get plain JavaScript objects
-        const audits = await AuditModel.find(filter)
-        .sort({ reviewer_reviewAt: -1 })
-        .populate("application_id", "appName app_rights")
-        .populate("emp_id", "name");
+       const audits = await AuditModel.find()
+  .sort({ reviewer_reviewAt: -1 })
+  .populate("application_id", "appName app_rights")
+  .populate("emp_id", "name");
+
  
     res.json(audits);
     return;
@@ -410,111 +472,116 @@ app.get("/pastAudits", async (req, res) => {
 
 
 app.post('/excelUpload', async (req, res) => {
-  const data = req.body; // This will be the JSON data from the frontend
-    var errorArr = [];
-    var index = 0;
-    var successArr = [];
+  const data = req.body; 
+  var errorArr = [];
+  var index = 0;
+  var successArr = [];
 
+  for (const item of data) {
+    index++;
 
-    // Iterate over each item in the data array
-    for (const item of data) {
-        index++;
+    if (
+      !item.hasOwnProperty('Application') || 
+      !item.hasOwnProperty('Employee') || 
+      !item.hasOwnProperty('HOD') || 
+      !item.hasOwnProperty('Rights')
+    ) {
+      errorArr.push({
+        Error: `Malfunction Schema Provided`,
+        row: index
+      });
+      continue; // Skip this item if keys are missing
+    }
 
-        // Check if the required keys exist
-        if (
-            !item.hasOwnProperty('Application') || 
-            !item.hasOwnProperty('Employee') || 
-            !item.hasOwnProperty('HOD') || 
-            !item.hasOwnProperty('Rights')
-        ) {
-          errorArr.push({
-            Error: `Malfunction Schema Provided`,
-            row: index
-        });
-            continue; // Skip this item if keys are missing
-        }
+    //#region Keys Checker
+    const applicationName = item.Application.toLowerCase();
+    const employeeName = item.Employee.toLowerCase();
+    const hodName = item.HOD.toLowerCase();
 
-        //#region  Keys Checker
-        // Convert values to lowercase for case-insensitive search
-        const applicationName = item.Application.toLowerCase();
-        const employeeName = item.Employee.toLowerCase();
-        const hodName = item.HOD.toLowerCase();
+    const appExists = await AppModel.findOne({ appName: new RegExp(`^${applicationName}$`, 'i') });
+    if (!appExists) {
+      errorArr.push({
+        Error: `Application "${item.Application}" not found in Applications`,
+        row: index
+      });
+      continue; // Skip to next item if 'Application' is invalid
+    }
 
-        // Check if the 'Application' value exists in the AppModel schema (case-insensitive)
-        const appExists = await AppModel.findOne({ appName: new RegExp(`^${applicationName}$`, 'i') });
-        if (!appExists) {
-            errorArr.push({
-                Error: `Application "${item.Application}" not found in Applications`,
-                row: index
-            });
-            continue; // Skip to next item if 'Application' is invalid
-        }
+    const employeeExists = await EmployeeModel.findOne({ email: new RegExp(`^${employeeName}$`, 'i') });
+    if (!employeeExists) {
+      errorArr.push({
+        Error: `Employee "${item.Employee}" not found in Employees`,
+        row: index
+      });
+      continue; // Skip to next item if 'Employee' is invalid
+    }
 
-        // Check if the 'Employee' value exists in the EmployeeModel schema (case-insensitive)
-        const employeeExists = await EmployeeModel.findOne({ name: new RegExp(`^${employeeName}$`, 'i') });
-        if (!employeeExists) {
-            errorArr.push({
-                Error: `Employee "${item.Employee}" not found in Employees`,
-                row: index
-            });
-            continue; // Skip to next item if 'Employee' is invalid
-        }
+    const hodExists = await UserModel.findOne({ name: new RegExp(`^${hodName}$`, 'i') });
+    if (!hodExists) {
+      errorArr.push({
+        Error: `HOD "${item.HOD}" not found in Users`,
+        row: index
+      });
+      continue; 
+    }
+    //#endregion
 
-        // Check if the 'HOD' value exists in the UserModel schema (case-insensitive)
-        const hodExists = await UserModel.findOne({ name: new RegExp(`^${hodName}$`, 'i') });
-        if (!hodExists) {
-            errorArr.push({
-                Error: `HOD "${item.HOD}" not found in Users`,
-                row: index
-            });
-            continue; // Skip to next item if 'HOD' is invalid
-        }
-        //#endregion
-      //   return res.status(400).json({
-      //     message: appExists,
-      //     errors: hodExists,
-      //     sad: employeeExists
-      // });
-    
-      const newReview = {
-        emp_id: employeeExists._id,
-        frequency_id: appExists.frequency_id,
-        user_id: hodExists._id,
-        application_id: appExists._id,
-        initialRights: item.Rights.toLowerCase(),
-        audit_date: await calculateNextAuditDate(appExists.frequency_id),
-      };
-    
-      let audit = await AuditModel.create(newReview)
+    const newReview = {
+      emp_id: employeeExists._id,
+      frequency_id: appExists.frequency_id,
+      user_id: hodExists._id,
+      application_id: appExists._id,
+      initialRights: item.Rights.toLowerCase(),
+      audit_date: await calculateNextAuditDate(appExists.frequency_id),
+    };
+
+    let audit = await AuditModel.create(newReview)
       .catch(err => res.status(500).json({ error: err.message })); 
-      
-      if (audit) {
-        audit = await AuditModel.findById(audit._id)
-            .populate("emp_id")
-            .populate("frequency_id")
-            .populate("user_id")
-            .populate("application_id");
 
-      successArr.push(audit);  
-    }
-    
-    }
+    if (audit) {
+      audit = await AuditModel.findById(audit._id)
+        .populate("emp_id")
+        .populate("frequency_id")
+        .populate("user_id")  // HOD populated here
+        .populate("application_id");
 
-    // If errors are found, return them in the response
-    if (errorArr.length > 0) {
-        return res.status(200).json({
-            message: "There were errors with the data.",
-            errors: errorArr
-        });
+      successArr.push({
+        ...audit._doc,
+        hodName: hodExists.name // Adding HOD name to the result
+      });
     }
+  }
 
-    // If no errors, send a success response
-    res.json({
-        succesData: successArr,
-        errorData: errorArr
+  // If errors are found, return them in the response
+  if (errorArr.length > 0) {
+    return res.status(200).json({
+      message: "There were errors with the data.",
+      errors: errorArr
     });
+  }
+
+  // If no errors, send a success response
+  res.json({
+    succesData: successArr,
+    errorData: errorArr
+  });
 });
 
+app.put('/employee/:id', async (req, res) => {
+  try {
+    const updatedItem = await EmployeeModel.findByIdAndUpdate(
+      req.params.id,
+      { status: 1 }, // Update status to 1
+      { new: true }
+    );
+    if (!updatedItem) {
+      return res.status(404).send('Employee not found');
+    }
+    res.json(updatedItem);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.listen(3000, () =>{
     console.log("I slove ");

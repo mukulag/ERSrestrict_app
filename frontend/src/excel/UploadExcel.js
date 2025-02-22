@@ -69,6 +69,8 @@ function UploadExcel() {
                                         <th>Application</th>
                                         <th>Initial Rights</th>
                                         <th>Audit Date</th>
+                                        <th>HOD</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,6 +81,8 @@ function UploadExcel() {
                                             <td>{item.application_id?.appName || "N/A"}</td>
                                             <td>{item.initialRights || "N/A"}</td>
                                             <td>{new Date(item.audit_date).toLocaleDateString()}</td>
+                                            <td>{item.hodName || "N/A"}</td> 
+
                                         </tr>
                                     ))}
                                 </tbody>
@@ -102,7 +106,7 @@ function UploadExcel() {
                                 <tbody>
                                     {report.errors.map((item) => (
                                         <tr>
-                                            <td>{item.row || "N/A"}</td>
+                                            <td>{++item.row || "N/A"}</td>
                                             <td>{item.Error || "N/A"}</td>
                                         </tr>
                                     ))}
